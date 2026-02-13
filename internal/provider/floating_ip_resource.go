@@ -3,9 +3,9 @@ package provider
 import (
 	"context"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/defaultplanmodifier"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/resourceenhancer"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/defaultplanmodifier"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/resourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -73,7 +73,7 @@ func (r *FloatingIPResource) Schema(ctx context.Context, req resource.SchemaRequ
 					stringplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.String{
-					stringvalidator.OneOf(sliceStringify(genesiscloud.AllRegions)...),
+					stringvalidator.OneOf(sliceStringify(sagadata.AllRegions)...),
 				},
 			}),
 			"description": resourceenhancer.Attribute(ctx, schema.StringAttribute{
@@ -98,8 +98,8 @@ func (r *FloatingIPResource) Schema(ctx context.Context, req resource.SchemaRequ
 					stringplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.String{
-					stringvalidator.OneOf(string(genesiscloud.CreateFloatingIPJSONBodyVersionIpv4)),
-					// stringvalidator.OneOf(sliceStringify(genesiscloud.AllFloatingIPVersions)...),
+					stringvalidator.OneOf(string(sagadata.CreateFloatingIPJSONBodyVersionIpv4)),
+					// stringvalidator.OneOf(sliceStringify(sagadata.AllFloatingIPVersions)...),
 				},
 			}),
 			"ip_address": resourceenhancer.Attribute(ctx, schema.StringAttribute{
@@ -139,10 +139,10 @@ func (r *FloatingIPResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 	defer cancel()
 
-	body := genesiscloud.CreateFloatingIPJSONRequestBody{}
+	body := sagadata.CreateFloatingIPJSONRequestBody{}
 
 	body.Name = data.Name.ValueString()
-	body.Region = genesiscloud.Region(data.Region.ValueString())
+	body.Region = sagadata.Region(data.Region.ValueString())
 	body.Description = pointer(data.Description.ValueString())
 
 	response, err := r.client.CreateFloatingIPWithResponse(ctx, body)
@@ -202,7 +202,7 @@ func (r *FloatingIPResource) Create(ctx context.Context, req resource.CreateRequ
 		}
 
 		status := floatingIPResponse.FloatingIp.Status
-		if status == genesiscloud.FloatingIpStatusCreated || status == genesiscloud.FloatingIpStatusError {
+		if status == sagadata.FloatingIpStatusCreated || status == sagadata.FloatingIpStatusError {
 			resp.Diagnostics.Append(data.PopulateFromClientResponse(ctx, &floatingIPResponse.FloatingIp)...)
 			if resp.Diagnostics.HasError() {
 				return
@@ -214,7 +214,7 @@ func (r *FloatingIPResource) Create(ctx context.Context, req resource.CreateRequ
 				return
 			}
 
-			if status == genesiscloud.FloatingIpStatusError {
+			if status == sagadata.FloatingIpStatusError {
 				resp.Diagnostics.AddError("Provisioning Error", generateErrorMessage("polling floatingIP", ErrResourceInErrorState))
 			}
 			return
@@ -283,7 +283,7 @@ func (r *FloatingIPResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 	defer cancel()
 
-	body := genesiscloud.UpdateFloatingIPJSONRequestBody{}
+	body := sagadata.UpdateFloatingIPJSONRequestBody{}
 
 	body.Name = pointer(data.Name.ValueString())
 	body.Description = data.Description.ValueStringPointer()

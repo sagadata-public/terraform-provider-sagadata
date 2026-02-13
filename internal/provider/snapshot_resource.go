@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/defaultplanmodifier"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/resourceenhancer"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/defaultplanmodifier"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/resourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -151,7 +151,7 @@ func (r *SnapshotResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	var snapshotResponse *genesiscloud.SingleSnapshotResponse
+	var snapshotResponse *sagadata.SingleSnapshotResponse
 
 	if !data.SourceInstanceId.IsNull() {
 		if data.Region.ValueString() != "" {
@@ -162,14 +162,14 @@ func (r *SnapshotResource) Create(ctx context.Context, req resource.CreateReques
 			return
 
 		}
-		body := genesiscloud.CreateInstanceSnapshotJSONRequestBody{}
+		body := sagadata.CreateInstanceSnapshotJSONRequestBody{}
 
 		body.Name = data.Name.ValueString()
 
 		instanceId := data.SourceInstanceId.ValueString()
 
 		if !data.ReplicatedRegion.IsNull() {
-			body.ReplicatedRegion = pointer(genesiscloud.Region(data.ReplicatedRegion.ValueString()))
+			body.ReplicatedRegion = pointer(sagadata.Region(data.ReplicatedRegion.ValueString()))
 		}
 
 		response, err := r.client.CreateInstanceSnapshotWithResponse(ctx, instanceId, body)
@@ -204,11 +204,11 @@ func (r *SnapshotResource) Create(ctx context.Context, req resource.CreateReques
 			return
 		}
 
-		body := genesiscloud.CloneSnapshotJSONRequestBody{}
+		body := sagadata.CloneSnapshotJSONRequestBody{}
 
 		body.Name = data.Name.ValueString()
 
-		body.Region = genesiscloud.Region(data.Region.ValueString())
+		body.Region = sagadata.Region(data.Region.ValueString())
 
 		snapshotId := data.SourceSnapshotId.ValueString()
 
@@ -270,7 +270,7 @@ func (r *SnapshotResource) Create(ctx context.Context, req resource.CreateReques
 		}
 
 		status := snapshotResponse.Snapshot.Status
-		if status == genesiscloud.SnapshotStatusCreated || status == genesiscloud.SnapshotStatusError {
+		if status == sagadata.SnapshotStatusCreated || status == sagadata.SnapshotStatusError {
 			resp.Diagnostics.Append(data.PopulateFromClientResponse(ctx, &snapshotResponse.Snapshot)...)
 			if resp.Diagnostics.HasError() {
 				return
@@ -282,7 +282,7 @@ func (r *SnapshotResource) Create(ctx context.Context, req resource.CreateReques
 				return
 			}
 
-			if status == genesiscloud.SnapshotStatusError {
+			if status == sagadata.SnapshotStatusError {
 				resp.Diagnostics.AddError("Provisioning Error", generateErrorMessage("polling snapshot", ErrResourceInErrorState))
 			}
 			return
@@ -351,7 +351,7 @@ func (r *SnapshotResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 	defer cancel()
 
-	body := genesiscloud.UpdateSnapshotJSONRequestBody{}
+	body := sagadata.UpdateSnapshotJSONRequestBody{}
 
 	body.Name = pointer(data.Name.ValueString())
 

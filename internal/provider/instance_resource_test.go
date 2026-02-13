@@ -9,7 +9,7 @@ import (
 
 func testAccInstanceResourceConfig(name string) string {
 	return fmt.Sprintf(`
-resource "genesiscloud_instance" "test" {
+resource "sagadata_instance" "test" {
   name = %[1]q
 }
 `, name)
@@ -24,13 +24,13 @@ func TestAccInstanceResource(t *testing.T) {
 			{
 				Config: providerConfig + testAccInstanceResourceConfig("one"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("genesiscloud_instance.test", "id", "instance-id"),
-					resource.TestCheckResourceAttr("genesiscloud_instance.test", "name", "one"),
+					resource.TestCheckResourceAttr("sagadata_instance.test", "id", "instance-id"),
+					resource.TestCheckResourceAttr("sagadata_instance.test", "name", "one"),
 				),
 			},
 			// ImportState testing
 			{
-				ResourceName:      "genesiscloud_instance.test",
+				ResourceName:      "sagadata_instance.test",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -38,7 +38,7 @@ func TestAccInstanceResource(t *testing.T) {
 			{
 				Config: providerConfig + testAccInstanceResourceConfig("two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("genesiscloud_instance.test", "name", "two"),
+					resource.TestCheckResourceAttr("sagadata_instance.test", "name", "two"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

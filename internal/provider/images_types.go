@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/genesiscloud/genesiscloud-go"
+	"github.com/sagadata-public/sagadata-go"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/datasource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -50,7 +50,7 @@ type ImageModel struct {
 	Versions types.List `tfsdk:"versions"`
 }
 
-func (data *ImageModel) PopulateFromClientResponse(ctx context.Context, image *genesiscloud.Image) (diag diag.Diagnostics) {
+func (data *ImageModel) PopulateFromClientResponse(ctx context.Context, image *sagadata.Image) (diag diag.Diagnostics) {
 	data.CreatedAt = types.StringValue(image.CreatedAt.Format(time.RFC3339))
 	data.Id = types.StringValue(image.Id)
 	data.Name = types.StringValue(image.Name)

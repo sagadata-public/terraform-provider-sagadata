@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/defaultplanmodifier"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/resourceenhancer"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/defaultplanmodifier"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/resourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -81,7 +81,7 @@ func (r *FilesystemResource) Schema(ctx context.Context, req resource.SchemaRequ
 					stringplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.String{
-					stringvalidator.OneOf(sliceStringify(genesiscloud.AllRegions)...),
+					stringvalidator.OneOf(sliceStringify(sagadata.AllRegions)...),
 				},
 			}),
 			"size": resourceenhancer.Attribute(ctx, schema.Int64Attribute{
@@ -120,7 +120,7 @@ func (r *FilesystemResource) Schema(ctx context.Context, req resource.SchemaRequ
 					stringplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.String{
-					stringvalidator.OneOf(sliceStringify(genesiscloud.AllFilesystemTypes)...),
+					stringvalidator.OneOf(sliceStringify(sagadata.AllFilesystemTypes)...),
 				},
 			}),
 
@@ -155,13 +155,13 @@ func (r *FilesystemResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 	defer cancel()
 
-	body := genesiscloud.CreateFilesystemJSONRequestBody{}
+	body := sagadata.CreateFilesystemJSONRequestBody{}
 
 	body.Description = pointer(data.Description.ValueString())
 	body.Name = data.Name.ValueString()
-	body.Region = genesiscloud.Region(data.Region.ValueString())
+	body.Region = sagadata.Region(data.Region.ValueString())
 	body.Size = int(data.Size.ValueInt64())
-	body.Type = pointer(genesiscloud.FilesystemType(data.Type.ValueString()))
+	body.Type = pointer(sagadata.FilesystemType(data.Type.ValueString()))
 
 	response, err := r.client.CreateFilesystemWithResponse(ctx, body)
 	if err != nil {
@@ -220,7 +220,7 @@ func (r *FilesystemResource) Create(ctx context.Context, req resource.CreateRequ
 		}
 
 		status := filesystemResponse.Filesystem.Status
-		if status == genesiscloud.FilesystemStatusCreated || status == genesiscloud.FilesystemStatusError {
+		if status == sagadata.FilesystemStatusCreated || status == sagadata.FilesystemStatusError {
 			resp.Diagnostics.Append(data.PopulateFromClientResponse(ctx, &filesystemResponse.Filesystem)...)
 			if resp.Diagnostics.HasError() {
 				return
@@ -232,7 +232,7 @@ func (r *FilesystemResource) Create(ctx context.Context, req resource.CreateRequ
 				return
 			}
 
-			if status == genesiscloud.FilesystemStatusError {
+			if status == sagadata.FilesystemStatusError {
 				resp.Diagnostics.AddError("Provisioning Error", generateErrorMessage("polling filesystem", ErrResourceInErrorState))
 			}
 			return
@@ -301,7 +301,7 @@ func (r *FilesystemResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 	defer cancel()
 
-	body := genesiscloud.UpdateFilesystemJSONRequestBody{}
+	body := sagadata.UpdateFilesystemJSONRequestBody{}
 
 	body.Name = pointer(data.Name.ValueString())
 	body.Description = pointer(data.Description.ValueString())

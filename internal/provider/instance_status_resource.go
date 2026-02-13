@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/resourceenhancer"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/resourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -55,7 +55,7 @@ func (r *InstanceStatusResource) Schema(ctx context.Context, req resource.Schema
 				MarkdownDescription: "The target instance status.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf(string(genesiscloud.InstanceStatusActive), string(genesiscloud.InstanceStatusStopped)),
+					stringvalidator.OneOf(string(sagadata.InstanceStatusActive), string(sagadata.InstanceStatusStopped)),
 				},
 			}),
 
@@ -82,9 +82,9 @@ func (r *InstanceStatusResource) Create(ctx context.Context, req resource.Create
 	defer cancel()
 
 	instanceId := data.InstanceId.ValueString()
-	targetStatus := genesiscloud.InstanceStatus(data.Status.ValueString())
+	targetStatus := sagadata.InstanceStatus(data.Status.ValueString())
 
-	var instanceAction genesiscloud.InstanceAction
+	var instanceAction sagadata.InstanceAction
 
 	{
 		response, err := r.client.GetInstanceWithResponse(ctx, instanceId)
@@ -118,16 +118,16 @@ func (r *InstanceStatusResource) Create(ctx context.Context, req resource.Create
 			return
 		}
 
-		if targetStatus == genesiscloud.InstanceStatusActive &&
-			instanceResponse.Instance.Status == genesiscloud.InstanceStatusStopped {
+		if targetStatus == sagadata.InstanceStatusActive &&
+			instanceResponse.Instance.Status == sagadata.InstanceStatusStopped {
 
-			instanceAction = genesiscloud.InstanceActionStart
-		} else if targetStatus == genesiscloud.InstanceStatusStopped &&
-			(instanceResponse.Instance.Status == genesiscloud.InstanceStatusActive ||
-				instanceResponse.Instance.Status == genesiscloud.InstanceStatusStarting ||
-				instanceResponse.Instance.Status == genesiscloud.InstanceStatusError) {
+			instanceAction = sagadata.InstanceActionStart
+		} else if targetStatus == sagadata.InstanceStatusStopped &&
+			(instanceResponse.Instance.Status == sagadata.InstanceStatusActive ||
+				instanceResponse.Instance.Status == sagadata.InstanceStatusStarting ||
+				instanceResponse.Instance.Status == sagadata.InstanceStatusError) {
 
-			instanceAction = genesiscloud.InstanceActionStop
+			instanceAction = sagadata.InstanceActionStop
 		} else {
 			resp.Diagnostics.AddError("Cannot transition instance status",
 				fmt.Sprintf("The instance resource with id %q cannot be transitioned from %q status to %q status. If the current status is transient (ending in 'ing' e.g. stopping) waiting a bit is usually enough.",
@@ -136,7 +136,7 @@ func (r *InstanceStatusResource) Create(ctx context.Context, req resource.Create
 		}
 	}
 
-	body := genesiscloud.PerformInstanceActionJSONRequestBody{}
+	body := sagadata.PerformInstanceActionJSONRequestBody{}
 	body.Action = instanceAction
 
 	response, err := r.client.PerformInstanceActionWithResponse(ctx, instanceId, body)
@@ -260,9 +260,9 @@ func (r *InstanceStatusResource) Update(ctx context.Context, req resource.Update
 	defer cancel()
 
 	instanceId := data.InstanceId.ValueString()
-	targetStatus := genesiscloud.InstanceStatus(data.Status.ValueString())
+	targetStatus := sagadata.InstanceStatus(data.Status.ValueString())
 
-	var instanceAction genesiscloud.InstanceAction
+	var instanceAction sagadata.InstanceAction
 
 	{
 		response, err := r.client.GetInstanceWithResponse(ctx, instanceId)
@@ -296,16 +296,16 @@ func (r *InstanceStatusResource) Update(ctx context.Context, req resource.Update
 			return
 		}
 
-		if targetStatus == genesiscloud.InstanceStatusActive &&
-			instanceResponse.Instance.Status == genesiscloud.InstanceStatusStopped {
+		if targetStatus == sagadata.InstanceStatusActive &&
+			instanceResponse.Instance.Status == sagadata.InstanceStatusStopped {
 
-			instanceAction = genesiscloud.InstanceActionStart
-		} else if targetStatus == genesiscloud.InstanceStatusStopped &&
-			(instanceResponse.Instance.Status == genesiscloud.InstanceStatusActive ||
-				instanceResponse.Instance.Status == genesiscloud.InstanceStatusStarting ||
-				instanceResponse.Instance.Status == genesiscloud.InstanceStatusError) {
+			instanceAction = sagadata.InstanceActionStart
+		} else if targetStatus == sagadata.InstanceStatusStopped &&
+			(instanceResponse.Instance.Status == sagadata.InstanceStatusActive ||
+				instanceResponse.Instance.Status == sagadata.InstanceStatusStarting ||
+				instanceResponse.Instance.Status == sagadata.InstanceStatusError) {
 
-			instanceAction = genesiscloud.InstanceActionStop
+			instanceAction = sagadata.InstanceActionStop
 		} else {
 			resp.Diagnostics.AddError("Cannot transition instance status",
 				fmt.Sprintf("The instance resource with id %q cannot be transitioned from %q status to %q status. If the current status is transient (ending in 'ing' e.g. stopping) waiting a bit is usually enough.",
@@ -314,7 +314,7 @@ func (r *InstanceStatusResource) Update(ctx context.Context, req resource.Update
 		}
 	}
 
-	body := genesiscloud.PerformInstanceActionJSONRequestBody{}
+	body := sagadata.PerformInstanceActionJSONRequestBody{}
 	body.Action = instanceAction
 
 	response, err := r.client.PerformInstanceActionWithResponse(ctx, instanceId, body)

@@ -10,9 +10,9 @@ import (
 
 const (
 	// providerConfig is a shared configuration to combine with the actual
-	// test configuration so the Genesis Cloud client is properly configured.
+	// test configuration so the Saga Data client is properly configured.
 	providerConfig = `
-provider "genesiscloud" {}
+provider "sagadata" {}
 `
 )
 
@@ -21,7 +21,7 @@ provider "genesiscloud" {}
 // CLI command executed to create a provider server to which the CLI can
 // reattach.
 var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"genesiscloud": providerserver.NewProtocol6WithError(New("test")()),
+	"sagadata": providerserver.NewProtocol6WithError(New("test")()),
 }
 
 func testAccPreCheck(t *testing.T) {
@@ -29,8 +29,8 @@ func testAccPreCheck(t *testing.T) {
 	// about the appropriate environment variables being set are common to see in a pre-check
 	// function
 
-	if os.Getenv("GENESISCLOUD_TOKEN") == "" {
-		t.Fatal("GENESISCLOUD_TOKEN must be set for acceptance tests")
+	if os.Getenv("SAGADATA_TOKEN") == "" {
+		t.Fatal("SAGADATA_TOKEN must be set for acceptance tests")
 	}
 
 }

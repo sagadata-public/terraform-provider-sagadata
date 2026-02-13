@@ -3,9 +3,9 @@ package provider
 import (
 	"context"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/defaultplanmodifier"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/resourceenhancer"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/defaultplanmodifier"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/resourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
@@ -80,7 +80,7 @@ func (r *SecurityGroupResource) Schema(ctx context.Context, req resource.SchemaR
 					stringplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.String{
-					stringvalidator.OneOf(sliceStringify(genesiscloud.AllRegions)...),
+					stringvalidator.OneOf(sliceStringify(sagadata.AllRegions)...),
 				},
 			}),
 			"rules": schema.ListNestedAttribute{
@@ -91,7 +91,7 @@ func (r *SecurityGroupResource) Schema(ctx context.Context, req resource.SchemaR
 							MarkdownDescription: "The direction of the rule.",
 							Required:            true,
 							Validators: []validator.String{
-								stringvalidator.OneOf(sliceStringify(genesiscloud.AllSecurityGroupRuleDirections)...),
+								stringvalidator.OneOf(sliceStringify(sagadata.AllSecurityGroupRuleDirections)...),
 							},
 						}),
 						"port_range_max": resourceenhancer.Attribute(ctx, schema.Int64Attribute{
@@ -112,7 +112,7 @@ func (r *SecurityGroupResource) Schema(ctx context.Context, req resource.SchemaR
 							MarkdownDescription: "The protocol of the rule.",
 							Required:            true,
 							Validators: []validator.String{
-								stringvalidator.OneOf(sliceStringify(genesiscloud.AllSecurityGroupRuleProtocols)...),
+								stringvalidator.OneOf(sliceStringify(sagadata.AllSecurityGroupRuleProtocols)...),
 							},
 						}),
 					},
@@ -157,11 +157,11 @@ func (r *SecurityGroupResource) Create(ctx context.Context, req resource.CreateR
 	}
 	defer cancel()
 
-	body := genesiscloud.CreateSecurityGroupJSONRequestBody{}
+	body := sagadata.CreateSecurityGroupJSONRequestBody{}
 
 	body.Description = pointer(data.Description.ValueString())
 	body.Name = data.Name.ValueString()
-	body.Region = genesiscloud.Region(data.Region.ValueString())
+	body.Region = sagadata.Region(data.Region.ValueString())
 
 	for _, rule := range data.Rules {
 		var portRangeMax, portRangeMin *int
@@ -174,11 +174,11 @@ func (r *SecurityGroupResource) Create(ctx context.Context, req resource.CreateR
 			portRangeMin = pointer(int(rule.PortRangeMin.ValueInt64()))
 		}
 
-		body.Rules = append(body.Rules, genesiscloud.SecurityGroupRule{
-			Direction:    genesiscloud.SecurityGroupRuleDirection(rule.Direction.ValueString()),
+		body.Rules = append(body.Rules, sagadata.SecurityGroupRule{
+			Direction:    sagadata.SecurityGroupRuleDirection(rule.Direction.ValueString()),
 			PortRangeMax: portRangeMax,
 			PortRangeMin: portRangeMin,
-			Protocol:     genesiscloud.SecurityGroupRuleProtocol(rule.Protocol.ValueString()),
+			Protocol:     sagadata.SecurityGroupRuleProtocol(rule.Protocol.ValueString()),
 		})
 	}
 
@@ -239,7 +239,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, req resource.CreateR
 		}
 
 		status := securityGroupResponse.SecurityGroup.Status
-		if status == genesiscloud.SecurityGroupStatusCreated || status == genesiscloud.SecurityGroupStatusError {
+		if status == sagadata.SecurityGroupStatusCreated || status == sagadata.SecurityGroupStatusError {
 			resp.Diagnostics.Append(data.PopulateFromClientResponse(ctx, &securityGroupResponse.SecurityGroup)...)
 			if resp.Diagnostics.HasError() {
 				return
@@ -251,7 +251,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, req resource.CreateR
 				return
 			}
 
-			if status == genesiscloud.SecurityGroupStatusError {
+			if status == sagadata.SecurityGroupStatusError {
 				resp.Diagnostics.AddError("Provisioning Error", generateErrorMessage("polling security_group", ErrResourceInErrorState))
 			}
 			return
@@ -320,11 +320,11 @@ func (r *SecurityGroupResource) Update(ctx context.Context, req resource.UpdateR
 	}
 	defer cancel()
 
-	body := genesiscloud.UpdateSecurityGroupJSONRequestBody{}
+	body := sagadata.UpdateSecurityGroupJSONRequestBody{}
 
 	body.Description = pointer(data.Description.ValueString())
 	body.Name = pointer(data.Name.ValueString())
-	rules := make([]genesiscloud.SecurityGroupRule, 0)
+	rules := make([]sagadata.SecurityGroupRule, 0)
 
 	for _, rule := range data.Rules {
 		var portRangeMax, portRangeMin *int
@@ -337,11 +337,11 @@ func (r *SecurityGroupResource) Update(ctx context.Context, req resource.UpdateR
 			portRangeMin = pointer(int(rule.PortRangeMin.ValueInt64()))
 		}
 
-		rules = append(rules, genesiscloud.SecurityGroupRule{
-			Direction:    genesiscloud.SecurityGroupRuleDirection(rule.Direction.ValueString()),
+		rules = append(rules, sagadata.SecurityGroupRule{
+			Direction:    sagadata.SecurityGroupRuleDirection(rule.Direction.ValueString()),
 			PortRangeMax: portRangeMax,
 			PortRangeMin: portRangeMin,
-			Protocol:     genesiscloud.SecurityGroupRuleProtocol(rule.Protocol.ValueString()),
+			Protocol:     sagadata.SecurityGroupRuleProtocol(rule.Protocol.ValueString()),
 		})
 	}
 
@@ -404,7 +404,7 @@ func (r *SecurityGroupResource) Update(ctx context.Context, req resource.UpdateR
 		}
 
 		status := securityGroupResponse.SecurityGroup.Status
-		if status == genesiscloud.SecurityGroupStatusCreated || status == genesiscloud.SecurityGroupStatusError {
+		if status == sagadata.SecurityGroupStatusCreated || status == sagadata.SecurityGroupStatusError {
 			resp.Diagnostics.Append(data.PopulateFromClientResponse(ctx, &securityGroupResponse.SecurityGroup)...)
 			if resp.Diagnostics.HasError() {
 				return
@@ -416,7 +416,7 @@ func (r *SecurityGroupResource) Update(ctx context.Context, req resource.UpdateR
 				return
 			}
 
-			if status == genesiscloud.SecurityGroupStatusError {
+			if status == sagadata.SecurityGroupStatusError {
 				resp.Diagnostics.AddError("Provisioning Error", generateErrorMessage("polling security_group", ErrResourceInErrorState))
 			}
 			return

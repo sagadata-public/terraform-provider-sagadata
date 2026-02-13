@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/genesiscloud/genesiscloud-go"
+	"github.com/sagadata-public/sagadata-go"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -51,7 +51,7 @@ type SecurityGroupResourceModel struct {
 	Timeouts timeouts.Value `tfsdk:"timeouts"`
 }
 
-func (data *SecurityGroupResourceModel) PopulateFromClientResponse(ctx context.Context, securityGroup *genesiscloud.SecurityGroup) (diag diag.Diagnostics) {
+func (data *SecurityGroupResourceModel) PopulateFromClientResponse(ctx context.Context, securityGroup *sagadata.SecurityGroup) (diag diag.Diagnostics) {
 	data.CreatedAt = types.StringValue(securityGroup.CreatedAt.Format(time.RFC3339))
 	data.Description = types.StringValue(securityGroup.Description)
 	data.Id = types.StringValue(securityGroup.Id)

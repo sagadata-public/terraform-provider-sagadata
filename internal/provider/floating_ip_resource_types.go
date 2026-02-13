@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/genesiscloud/genesiscloud-go"
+	"github.com/sagadata-public/sagadata-go"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -45,7 +45,7 @@ type FloatingIPResourceModel struct {
 	Timeouts timeouts.Value `tfsdk:"timeouts"`
 }
 
-func (data *FloatingIPResourceModel) PopulateFromClientResponse(ctx context.Context, floatingIP *genesiscloud.FloatingIP) (diag diag.Diagnostics) {
+func (data *FloatingIPResourceModel) PopulateFromClientResponse(ctx context.Context, floatingIP *sagadata.FloatingIP) (diag diag.Diagnostics) {
 	data.CreatedAt = types.StringValue(floatingIP.CreatedAt.Format(time.RFC3339))
 	data.Id = types.StringValue(floatingIP.Id)
 	data.Name = types.StringValue(floatingIP.Name)

@@ -3,7 +3,7 @@ package datasourceenhancer
 import (
 	"context"
 
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/resourceenhancer"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/resourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
 

@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/genesiscloud/genesiscloud-go"
+	"github.com/sagadata-public/sagadata-go"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -27,7 +27,7 @@ func (l ClientLogger) Printf(format string, a ...interface{}) {
 }
 
 type Client struct {
-	*genesiscloud.ClientWithResponses
+	*sagadata.ClientWithResponses
 
 	PollingInterval time.Duration
 }
@@ -42,7 +42,7 @@ func (c *Client) PollingWait(ctx context.Context) error {
 }
 
 type ClientConfig struct {
-	genesiscloud.ClientConfig
+	sagadata.ClientConfig
 	PollingInterval time.Duration
 }
 
@@ -52,11 +52,11 @@ func NewClient(ctx context.Context, config ClientConfig) (*Client, error) {
 	retryClient.Logger = ClientLogger{ctx: ctx}
 	retryClient.CheckRetry = RetryPolicy
 
-	opts := []genesiscloud.ClientOption{
-		genesiscloud.WithHTTPClient(retryClient.StandardClient()),
+	opts := []sagadata.ClientOption{
+		sagadata.WithHTTPClient(retryClient.StandardClient()),
 	}
 
-	client, err := genesiscloud.NewGenesisCloudClient(config.ClientConfig, opts...)
+	client, err := sagadata.NewSagaDataClient(config.ClientConfig, opts...)
 	if err != nil {
 		return nil, err
 	}

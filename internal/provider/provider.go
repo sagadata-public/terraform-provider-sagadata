@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/providerenhancer"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/timedurationvalidator"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/providerenhancer"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/timedurationvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -18,43 +18,43 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// Ensure GenesisCloudProvider satisfies various provider interfaces.
+// Ensure SagaDataProvider satisfies various provider interfaces.
 var (
-	_ provider.Provider = &GenesisCloudProvider{}
+	_ provider.Provider = &SagaDataProvider{}
 )
 
-// GenesisCloudProvider defines the provider implementation.
-type GenesisCloudProvider struct {
+// SagaDataProvider defines the provider implementation.
+type SagaDataProvider struct {
 	// version is set to the provider version on release, "dev" when the
 	// provider is built and ran locally, and "test" when running acceptance
 	// testing.
 	version string
 }
 
-// GenesisCloudProviderModel describes the provider data model.
-type GenesisCloudProviderModel struct {
+// SagaDataProviderModel describes the provider data model.
+type SagaDataProviderModel struct {
 	Endpoint        types.String `tfsdk:"endpoint"`
 	Token           types.String `tfsdk:"token"`
 	PollingInterval types.String `tfsdk:"polling_interval"`
 }
 
-func (p *GenesisCloudProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "genesiscloud"
+func (p *SagaDataProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "sagadata"
 	resp.Version = p.version
 }
 
-func (p *GenesisCloudProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *SagaDataProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "The Genesis Cloud provider is used to interact with resources supported by [Genesis Cloud](https://www.genesiscloud.com/). The provider needs to be configured with the proper credentials before it can be used.",
+		MarkdownDescription: "The Saga Data provider is used to interact with resources supported by [Saga Data](https://www.sagadata.no/). The provider needs to be configured with the proper credentials before it can be used.",
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
 				MarkdownDescription: fmt.Sprintf(
-					"Genesis Cloud API endpoint. May also be provided via `GENESISCLOUD_ENDPOINT` environment variable. If neither is provided, defaults to `%s`.",
-					genesiscloud.DefaultEndpoint),
+					"Saga Data API endpoint. May also be provided via `SAGADATA_ENDPOINT` environment variable. If neither is provided, defaults to `%s`.",
+					sagadata.DefaultEndpoint),
 				Optional: true,
 			},
 			"token": schema.StringAttribute{
-				MarkdownDescription: "Genesis Cloud API token. May also be provided via `GENESISCLOUD_TOKEN` environment variable.",
+				MarkdownDescription: "Saga Data API token. May also be provided via `SAGADATA_TOKEN` environment variable.",
 				Optional:            true,
 				Sensitive:           true,
 			},
@@ -69,8 +69,8 @@ func (p *GenesisCloudProvider) Schema(ctx context.Context, req provider.SchemaRe
 	}
 }
 
-func (p *GenesisCloudProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	var data GenesisCloudProviderModel
+func (p *SagaDataProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	var data SagaDataProviderModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -81,18 +81,18 @@ func (p *GenesisCloudProvider) Configure(ctx context.Context, req provider.Confi
 	if data.Endpoint.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("endpoint"),
-			"Unknown Genesis Cloud API endpoint",
-			"The provider cannot create the Genesis Cloud API client as there is an unknown configuration value for the Genesis Cloud API endpoint. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the GENESISCLOUD_ENDPOINT environment variable.",
+			"Unknown Saga Data API endpoint",
+			"The provider cannot create the Saga Data API client as there is an unknown configuration value for the Saga Data API endpoint. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the SAGADATA_ENDPOINT environment variable.",
 		)
 	}
 
 	if data.Token.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("token"),
-			"Unknown Genesis Cloud API token",
-			"The provider cannot create the Genesis Cloud API client as there is an unknown configuration value for the Genesis Cloud API token. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the GENESISCLOUD_TOKEN environment variable.",
+			"Unknown Saga Data API token",
+			"The provider cannot create the Saga Data API client as there is an unknown configuration value for the Saga Data API token. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the SAGADATA_TOKEN environment variable.",
 		)
 	}
 
@@ -100,7 +100,7 @@ func (p *GenesisCloudProvider) Configure(ctx context.Context, req provider.Confi
 		resp.Diagnostics.AddAttributeError(
 			path.Root("polling_interval"),
 			"Unknown Polling Interval",
-			"The provider cannot create the Genesis Cloud API client as there is an unknown configuration value for the Polling Interval. "+
+			"The provider cannot create the Saga Data API client as there is an unknown configuration value for the Polling Interval. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or remove it to use the default.",
 		)
 	}
@@ -109,8 +109,8 @@ func (p *GenesisCloudProvider) Configure(ctx context.Context, req provider.Confi
 		return
 	}
 
-	endpoint := os.Getenv("GENESISCLOUD_ENDPOINT")
-	token := os.Getenv("GENESISCLOUD_TOKEN")
+	endpoint := os.Getenv("SAGADATA_ENDPOINT")
+	token := os.Getenv("SAGADATA_TOKEN")
 	pollingInterval := 2 * time.Second
 
 	if !data.Endpoint.IsNull() {
@@ -134,15 +134,15 @@ func (p *GenesisCloudProvider) Configure(ctx context.Context, req provider.Confi
 	}
 
 	if endpoint == "" {
-		endpoint = genesiscloud.DefaultEndpoint
+		endpoint = sagadata.DefaultEndpoint
 	}
 
 	if token == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("token"),
-			"Missing Genesis Cloud API token",
-			"The provider cannot create the Genesis Cloud API client as there is a missing or empty value for the Genesis Cloud API token. "+
-				"Set the token value in the configuration or use the GENESISCLOUD_TOKEN environment variable. "+
+			"Missing Saga Data API token",
+			"The provider cannot create the Saga Data API client as there is a missing or empty value for the Saga Data API token. "+
+				"Set the token value in the configuration or use the SAGADATA_TOKEN environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
 	}
@@ -152,7 +152,7 @@ func (p *GenesisCloudProvider) Configure(ctx context.Context, req provider.Confi
 	}
 
 	providerClient, err := NewClient(ctx, ClientConfig{
-		ClientConfig: genesiscloud.ClientConfig{
+		ClientConfig: sagadata.ClientConfig{
 			Endpoint: endpoint,
 			Token:    token,
 		},
@@ -160,8 +160,8 @@ func (p *GenesisCloudProvider) Configure(ctx context.Context, req provider.Confi
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Create Genesis Cloud API Client",
-			"An unexpected error occurred when creating the Genesis Cloud API client. "+
+			"Unable to Create Saga Data API Client",
+			"An unexpected error occurred when creating the Saga Data API client. "+
 				"If the error is not clear, please contact the provider developers.\n\n"+
 				"Error: "+err.Error(),
 		)
@@ -172,7 +172,7 @@ func (p *GenesisCloudProvider) Configure(ctx context.Context, req provider.Confi
 	resp.ResourceData = providerClient
 }
 
-func (p *GenesisCloudProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *SagaDataProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewInstanceResource,
 		NewInstanceStatusResource,
@@ -185,7 +185,7 @@ func (p *GenesisCloudProvider) Resources(ctx context.Context) []func() resource.
 	}
 }
 
-func (p *GenesisCloudProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *SagaDataProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewImagesDataSource,
 	}
@@ -193,7 +193,7 @@ func (p *GenesisCloudProvider) DataSources(ctx context.Context) []func() datasou
 
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
-		return &GenesisCloudProvider{
+		return &SagaDataProvider{
 			version: version,
 		}
 	}

@@ -5,8 +5,8 @@ import (
 	"flag"
 	"log"
 
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/provider"
 )
 
 // Run "go generate" to format example terraform files and generate the docs for the registry/website
@@ -35,7 +35,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/genesiscloud/genesiscloud",
+		Address: "registry.terraform.io/sagadata-public/sagadata",
 		Debug:   debug,
 	}
 

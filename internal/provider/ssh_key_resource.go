@@ -3,8 +3,8 @@ package provider
 import (
 	"context"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/resourceenhancer"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/resourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -96,7 +96,7 @@ func (r *SSHKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 	defer cancel()
 
-	body := genesiscloud.CreateSSHKeyJSONRequestBody{}
+	body := sagadata.CreateSSHKeyJSONRequestBody{}
 
 	body.Name = data.Name.ValueString()
 	body.Value = data.PublicKey.ValueString()
@@ -189,7 +189,7 @@ func (r *SSHKeyResource) Update(ctx context.Context, req resource.UpdateRequest,
 	}
 	defer cancel()
 
-	body := genesiscloud.UpdateSSHKeyJSONRequestBody{}
+	body := sagadata.UpdateSSHKeyJSONRequestBody{}
 
 	body.Name = pointer(data.Name.ValueString())
 

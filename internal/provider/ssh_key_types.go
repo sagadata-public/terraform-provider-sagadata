@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/genesiscloud/genesiscloud-go"
+	"github.com/sagadata-public/sagadata-go"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -31,7 +31,7 @@ type SSHKeyResourceModel struct {
 	Timeouts timeouts.Value `tfsdk:"timeouts"`
 }
 
-func (data *SSHKeyResourceModel) PopulateFromClientResponse(ctx context.Context, sshKey *genesiscloud.SSHKey) (diag diag.Diagnostics) {
+func (data *SSHKeyResourceModel) PopulateFromClientResponse(ctx context.Context, sshKey *sagadata.SSHKey) (diag diag.Diagnostics) {
 	data.CreatedAt = types.StringValue(sshKey.CreatedAt.Format(time.RFC3339))
 	data.Fingerprint = types.StringValue(sshKey.Fingerprint)
 	data.Id = types.StringValue(sshKey.Id)

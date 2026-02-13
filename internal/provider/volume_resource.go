@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/defaultplanmodifier"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/resourceenhancer"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/defaultplanmodifier"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/resourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -79,7 +79,7 @@ func (r *VolumeResource) Schema(ctx context.Context, req resource.SchemaRequest,
 					stringplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.String{
-					stringvalidator.OneOf(sliceStringify(genesiscloud.AllRegions)...),
+					stringvalidator.OneOf(sliceStringify(sagadata.AllRegions)...),
 				},
 			}),
 			"size": resourceenhancer.Attribute(ctx, schema.Int64Attribute{
@@ -103,7 +103,7 @@ func (r *VolumeResource) Schema(ctx context.Context, req resource.SchemaRequest,
 					stringplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.String{
-					stringvalidator.OneOf(sliceStringify(genesiscloud.AllVolumeTypes)...),
+					stringvalidator.OneOf(sliceStringify(sagadata.AllVolumeTypes)...),
 				},
 			}),
 
@@ -138,13 +138,13 @@ func (r *VolumeResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 	defer cancel()
 
-	body := genesiscloud.CreateVolumeJSONRequestBody{}
+	body := sagadata.CreateVolumeJSONRequestBody{}
 
 	body.Description = pointer(data.Description.ValueString())
 	body.Name = data.Name.ValueString()
-	body.Region = genesiscloud.Region(data.Region.ValueString())
+	body.Region = sagadata.Region(data.Region.ValueString())
 	body.Size = int(data.Size.ValueInt64())
-	body.Type = pointer(genesiscloud.VolumeType(data.Type.ValueString()))
+	body.Type = pointer(sagadata.VolumeType(data.Type.ValueString()))
 
 	response, err := r.client.CreateVolumeWithResponse(ctx, body)
 	if err != nil {
@@ -203,7 +203,7 @@ func (r *VolumeResource) Create(ctx context.Context, req resource.CreateRequest,
 		}
 
 		status := volumeResponse.Volume.Status
-		if status == genesiscloud.VolumeStatusCreated || status == genesiscloud.VolumeStatusError {
+		if status == sagadata.VolumeStatusCreated || status == sagadata.VolumeStatusError {
 			resp.Diagnostics.Append(data.PopulateFromClientResponse(ctx, &volumeResponse.Volume)...)
 			if resp.Diagnostics.HasError() {
 				return
@@ -215,7 +215,7 @@ func (r *VolumeResource) Create(ctx context.Context, req resource.CreateRequest,
 				return
 			}
 
-			if status == genesiscloud.VolumeStatusError {
+			if status == sagadata.VolumeStatusError {
 				resp.Diagnostics.AddError("Provisioning Error", generateErrorMessage("polling volume", ErrResourceInErrorState))
 			}
 			return
@@ -284,7 +284,7 @@ func (r *VolumeResource) Update(ctx context.Context, req resource.UpdateRequest,
 	}
 	defer cancel()
 
-	body := genesiscloud.UpdateVolumeJSONRequestBody{}
+	body := sagadata.UpdateVolumeJSONRequestBody{}
 
 	body.Name = pointer(data.Name.ValueString())
 	body.Description = pointer(data.Description.ValueString())

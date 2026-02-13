@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/genesiscloud/genesiscloud-go"
+	"github.com/sagadata-public/sagadata-go"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -43,7 +43,7 @@ type VolumeResourceModel struct {
 	Timeouts timeouts.Value `tfsdk:"timeouts"`
 }
 
-func (data *VolumeResourceModel) PopulateFromClientResponse(ctx context.Context, volume *genesiscloud.Volume) (diag diag.Diagnostics) {
+func (data *VolumeResourceModel) PopulateFromClientResponse(ctx context.Context, volume *sagadata.Volume) (diag diag.Diagnostics) {
 	data.CreatedAt = types.StringValue(volume.CreatedAt.Format(time.RFC3339))
 	data.Description = types.StringValue(volume.Description)
 	data.Id = types.StringValue(volume.Id)

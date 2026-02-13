@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/genesiscloud/genesiscloud-go"
+	"github.com/sagadata-public/sagadata-go"
 )
 
 type ErrorResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	Error        *genesiscloud.Error
+	Error        *sagadata.Error
 }
 
 var ErrResourceInErrorState = errors.New("the resource is in error state")

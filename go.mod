@@ -1,11 +1,8 @@
-module github.com/genesiscloud/terraform-provider-genesiscloud
+module github.com/sagadata-public/terraform-provider-sagadata
 
-go 1.23.0
-
-toolchain go1.23.1
+go 1.24.5
 
 require (
-	github.com/genesiscloud/genesiscloud-go v1.0.16
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/hashicorp/terraform-plugin-docs v0.21.0
 	github.com/hashicorp/terraform-plugin-framework v1.14.1
@@ -14,6 +11,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.26.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-testing v1.12.0
+	github.com/sagadata-public/sagadata-go v1.1.0
 )
 
 require (

@@ -3,8 +3,8 @@ package provider
 import (
 	"context"
 
-	"github.com/genesiscloud/genesiscloud-go"
-	"github.com/genesiscloud/terraform-provider-genesiscloud/internal/datasourceenhancer"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/datasourceenhancer"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/datasource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -46,14 +46,14 @@ func (d *ImagesDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 						MarkdownDescription: "Filter by the kind of image.",
 						Required:            true,
 						Validators: []validator.String{
-							stringvalidator.OneOf(sliceStringify(genesiscloud.AllImageTypes)...),
+							stringvalidator.OneOf(sliceStringify(sagadata.AllImageTypes)...),
 						},
 					}),
 					"region": datasourceenhancer.Attribute(ctx, schema.StringAttribute{
 						MarkdownDescription: "Filter by the region identifier.",
 						Optional:            true,
 						Validators: []validator.String{
-							stringvalidator.OneOf(sliceStringify(genesiscloud.AllRegions)...),
+							stringvalidator.OneOf(sliceStringify(sagadata.AllRegions)...),
 						},
 					}),
 				},
@@ -122,16 +122,16 @@ func (d *ImagesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 	defer cancel()
 
-	filterType := pointer(genesiscloud.ImageType(data.Filter.Type.ValueString()))
+	filterType := pointer(sagadata.ImageType(data.Filter.Type.ValueString()))
 
-	var filterRegion *genesiscloud.Region
+	var filterRegion *sagadata.Region
 
 	if !data.Filter.Region.IsNull() && !data.Filter.Region.IsUnknown() {
-		filterRegion = pointer(genesiscloud.Region(data.Filter.Region.ValueString()))
+		filterRegion = pointer(sagadata.Region(data.Filter.Region.ValueString()))
 	}
 
 	for page := 1; ; page++ {
-		response, err := d.client.ListImagesPaginatedWithResponse(ctx, &genesiscloud.ListImagesPaginatedParams{
+		response, err := d.client.ListImagesPaginatedWithResponse(ctx, &sagadata.ListImagesPaginatedParams{
 			Page:    pointer(page),
 			PerPage: pointer(100),
 			Type:    filterType,

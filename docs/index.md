@@ -1,40 +1,40 @@
 ---
-page_title: "Provider: Genesis Cloud"
+page_title: "Provider: Saga Data"
 subcategory: ""
 description: |-
-  The Genesis Cloud provider is used to interact with resources supported by Genesis Cloud https://www.genesiscloud.com/. The provider needs to be configured with the proper credentials before it can be used.
+  The Saga Data provider is used to interact with resources supported by Saga Data https://www.sagadata.no/. The provider needs to be configured with the proper credentials before it can be used.
 ---
 
-# Genesis Cloud Provider
+# Saga Data Provider
 
-The Genesis Cloud provider is used to interact with resources supported by [Genesis Cloud](https://www.genesiscloud.com/). The provider needs to be configured with the proper credentials before it can be used.
+The Saga Data provider is used to interact with resources supported by [Saga Data](https://www.sagadata.no/). The provider needs to be configured with the proper credentials before it can be used.
 
-- [API Documentation](https://developers.genesiscloud.com/)
-- [How to generate an API token?](https://support.genesiscloud.com/support/solutions/articles/47001126146-how-to-generate-an-api-token-)
+- [API Documentation](https://developers.sagadata.no/)
+- [How to generate an API token?](https://support.sagadata.no/support/solutions/articles/47001126146-how-to-generate-an-api-token-)
 
-The [provider repository](https://github.com/genesiscloud/terraform-provider-genesiscloud) is licensed under Mozilla Public License 2.0 (no copyleft exception) (see [LICENSE.txt](https://github.com/genesiscloud/terraform-provider-genesiscloud/blob/main/LICENSE.txt)) and includes third-party code subject to third-party notices (see [THIRD-PARTY-NOTICES.txt](https://github.com/genesiscloud/terraform-provider-genesiscloud/blob/main/THIRD-PARTY-NOTICES.txt)).
+The [provider repository](https://github.com/sagadata-public/terraform-provider-sagadata) is licensed under Mozilla Public License 2.0 (no copyleft exception) (see [LICENSE.txt](https://github.com/sagadata-public/terraform-provider-sagadata/blob/main/LICENSE.txt)) and includes third-party code subject to third-party notices (see [THIRD-PARTY-NOTICES.txt](https://github.com/sagadata-public/terraform-provider-sagadata/blob/main/THIRD-PARTY-NOTICES.txt)).
 
 ## Example Usage
 
-- Create a Genesis Cloud account
+- Create a Saga Data account
 - Create an API token (see above)
-- Set the `GENESISCLOUD_TOKEN` env var or specify the `token` in the provider
+- Set the `SAGADATA_TOKEN` env var or specify the `token` in the provider
 - Make sure to set the version in the provider
 
 ```terraform
 terraform {
   required_providers {
-    genesiscloud = {
-      source = "genesiscloud/genesiscloud"
+    sagadata = {
+      source = "sagadata-public/sagadata"
       # version = "..."
     }
   }
 }
 
-provider "genesiscloud" {
+provider "sagadata" {
   # optional configuration...
 
-  # set GENESISCLOUD_TOKEN env var or:
+  # set SAGADATA_TOKEN env var or:
   # token = "..."
 }
 
@@ -44,12 +44,12 @@ locals {
   region = "NORD-NO-KRS-1"
 }
 
-resource "genesiscloud_ssh_key" "alice" {
+resource "sagadata_ssh_key" "alice" {
   name       = "alice"
   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBOpdKM8wSI07+PO4xLDL7zW/kNWGbdFXeHyBU1TRlBn alice@example.com"
 }
 
-resource "genesiscloud_security_group" "allow-ssh" {
+resource "sagadata_security_group" "allow-ssh" {
   name   = "allow-ssh"
   region = local.region
   rules = [
@@ -62,7 +62,7 @@ resource "genesiscloud_security_group" "allow-ssh" {
   ]
 }
 
-resource "genesiscloud_security_group" "allow-http" {
+resource "sagadata_security_group" "allow-http" {
   name   = "allow-http"
   region = local.region
   rules = [
@@ -75,7 +75,7 @@ resource "genesiscloud_security_group" "allow-http" {
   ]
 }
 
-resource "genesiscloud_security_group" "allow-https" {
+resource "sagadata_security_group" "allow-https" {
   name   = "allow-https"
   region = local.region
   rules = [
@@ -88,13 +88,13 @@ resource "genesiscloud_security_group" "allow-https" {
   ]
 }
 
-resource "genesiscloud_floating_ip" "floating_ip" {
+resource "sagadata_floating_ip" "floating_ip" {
   name    = "terraform-floating-ip"
   region  = local.region
   version = "ipv4"
 }
 
-resource "genesiscloud_instance" "instance" {
+resource "sagadata_instance" "instance" {
   name   = "terraform-instance"
   region = local.region
 
@@ -102,16 +102,16 @@ resource "genesiscloud_instance" "instance" {
   type  = "vcpu-4_memory-16g_nvidia-rtx-3080-1"
 
   ssh_key_ids = [
-    genesiscloud_ssh_key.alice.id,
+    sagadata_ssh_key.alice.id,
   ]
 
   security_group_ids = [
-    genesiscloud_security_group.allow-ssh.id,
-    genesiscloud_security_group.allow-http.id,
-    genesiscloud_security_group.allow-https.id,
+    sagadata_security_group.allow-ssh.id,
+    sagadata_security_group.allow-http.id,
+    sagadata_security_group.allow-https.id,
   ]
 
-  floating_ip_id = genesiscloud_floating_ip.floating_ip.id
+  floating_ip_id = sagadata_floating_ip.floating_ip.id
 
   disk_size = 128
 
@@ -128,7 +128,7 @@ EOF
 }
 
 output "connect" {
-  value = "ssh ubuntu@${genesiscloud_instance.instance.public_ip}"
+  value = "ssh ubuntu@${sagadata_instance.instance.public_ip}"
 }
 ```
 
@@ -137,7 +137,7 @@ output "connect" {
 
 ### Optional
 
-- `endpoint` (String) Genesis Cloud API endpoint. May also be provided via `GENESISCLOUD_ENDPOINT` environment variable. If neither is provided, defaults to `https://api.genesiscloud.com/compute/v1`.
+- `endpoint` (String) Saga Data API endpoint. May also be provided via `SAGADATA_ENDPOINT` environment variable. If neither is provided, defaults to `https://public-api.nord-no-krs-1.sagadata.tum.fail/compute/v1`.
 - `polling_interval` (String) The polling interval.
   - The string must be a positive [time duration](https://pkg.go.dev/time#ParseDuration), for example "10s".
-- `token` (String, Sensitive) Genesis Cloud API token. May also be provided via `GENESISCLOUD_TOKEN` environment variable.
+- `token` (String, Sensitive) Saga Data API token. May also be provided via `SAGADATA_TOKEN` environment variable.
