@@ -85,6 +85,9 @@ type InstanceResourceModel struct {
 	// ReservationId The id of the reservation the instance is associated with.
 	ReservationId types.String `tfsdk:"reservation_id"`
 
+	// PrivateNetworkIds The private networks attached to the instance.
+	PrivateNetworkIds types.Set `tfsdk:"private_network_ids"`
+
 	// Internal
 
 	// Timeouts The resource timeouts
