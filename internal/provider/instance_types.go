@@ -88,6 +88,9 @@ type InstanceResourceModel struct {
 	// PrivateNetworkIds The private networks attached to the instance.
 	PrivateNetworkIds types.Set `tfsdk:"private_network_ids"`
 
+	// K8sClusterId The Kubernetes cluster this instance belongs to.
+	K8sClusterId types.String `tfsdk:"k8s_cluster_id"`
+
 	// Internal
 
 	// Timeouts The resource timeouts
@@ -145,6 +148,10 @@ func (data *InstanceResourceModel) PopulateFromClientResponse(ctx context.Contex
 
 	if instance.ReservationId != nil {
 		data.ReservationId = types.StringValue(*instance.ReservationId)
+	}
+
+	if instance.K8sCluster != nil {
+		data.K8sClusterId = types.StringValue(*instance.K8sCluster)
 	}
 
 	if instance.DiskSize != nil {

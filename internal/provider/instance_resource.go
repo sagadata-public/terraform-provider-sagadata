@@ -231,6 +231,13 @@ func (r *InstanceResource) Schema(ctx context.Context, req resource.SchemaReques
 					setplanmodifier.RequiresReplace(),
 				},
 			}),
+			"k8s_cluster_id": resourceenhancer.Attribute(ctx, schema.StringAttribute{
+				MarkdownDescription: "The Kubernetes cluster this instance belongs to.",
+				Optional:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			}),
 
 			// Internal
 			"timeouts": timeouts.AttributesAll(ctx),
@@ -330,6 +337,10 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 		var privateNetworkIds []string
 		data.PrivateNetworkIds.ElementsAs(ctx, &privateNetworkIds, false)
 		body.PrivateNetworks = &privateNetworkIds
+	}
+
+	if !data.K8sClusterId.IsNull() && !data.K8sClusterId.IsUnknown() {
+		body.K8sCluster = data.K8sClusterId.ValueStringPointer()
 	}
 
 	response, err := r.client.CreateInstanceWithResponse(ctx, body)

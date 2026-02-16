@@ -183,12 +183,14 @@ func (p *SagaDataProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewSecurityGroupResource,
 		NewSnapshotResource,
 		NewPrivateNetworkResource,
+		NewKubernetesClusterResource,
 	}
 }
 
 func (p *SagaDataProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewImagesDataSource,
+		NewKubernetesClusterDataSource,
 	}
 }
 
