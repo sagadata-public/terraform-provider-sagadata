@@ -6,9 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/sagadata-public/sagadata-go"
-	"github.com/sagadata-public/terraform-provider-sagadata/internal/providerenhancer"
-	"github.com/sagadata-public/terraform-provider-sagadata/internal/timedurationvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -16,6 +13,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/sagadata-public/sagadata-go"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/providerenhancer"
+	"github.com/sagadata-public/terraform-provider-sagadata/internal/timedurationvalidator"
 )
 
 // Ensure SagaDataProvider satisfies various provider interfaces.
@@ -182,6 +182,7 @@ func (p *SagaDataProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewFilesystemResource,
 		NewSecurityGroupResource,
 		NewSnapshotResource,
+		NewPrivateNetworkResource,
 	}
 }
 

@@ -223,6 +223,14 @@ func (r *InstanceResource) Schema(ctx context.Context, req resource.SchemaReques
 				MarkdownDescription: "The id of the reservation the instance is associated with.",
 				Optional:            true,
 			}),
+			"private_network_ids": resourceenhancer.Attribute(ctx, schema.SetAttribute{
+				ElementType:         types.StringType,
+				MarkdownDescription: "The private networks to attach to the instance.",
+				Optional:            true,
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.RequiresReplace(),
+				},
+			}),
 
 			// Internal
 			"timeouts": timeouts.AttributesAll(ctx),
@@ -316,6 +324,12 @@ func (r *InstanceResource) Create(ctx context.Context, req resource.CreateReques
 
 	if !data.PlacementOption.IsNull() && !data.PlacementOption.IsUnknown() {
 		body.PlacementOption = pointer(data.PlacementOption.ValueString())
+	}
+
+	if !data.PrivateNetworkIds.IsNull() && !data.PrivateNetworkIds.IsUnknown() {
+		var privateNetworkIds []string
+		data.PrivateNetworkIds.ElementsAs(ctx, &privateNetworkIds, false)
+		body.PrivateNetworks = &privateNetworkIds
 	}
 
 	response, err := r.client.CreateInstanceWithResponse(ctx, body)
