@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.26.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-testing v1.12.0
-	github.com/sagadata-public/sagadata-go v1.1.0
+	github.com/sagadata-public/sagadata-go v1.2.0
 )
 
 require (

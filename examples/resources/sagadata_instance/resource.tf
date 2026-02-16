@@ -30,3 +30,23 @@ resource "sagadata_instance" "with_private_network" {
     "my-ssh-key-id"
   ]
 }
+
+# Example with Kubernetes cluster
+resource "sagadata_kubernetes_cluster" "example" {
+  name   = "my-cluster"
+  region = "NORD-NO-KRS-1"
+}
+
+resource "sagadata_instance" "with_k8s_cluster" {
+  name   = "k8s-node"
+  region = "NORD-NO-KRS-1"
+
+  image = "ubuntu-24.04"
+  type  = "vcpu-2_memory-4g"
+
+  k8s_cluster_id = sagadata_kubernetes_cluster.example.id
+
+  ssh_key_ids = [
+    "my-ssh-key-id"
+  ]
+}
