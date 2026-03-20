@@ -100,11 +100,7 @@ func (r *KubernetesClusterResource) Create(ctx context.Context, req resource.Cre
 
 	body := sagadata.CreateKubernetesClusterJSONRequestBody{}
 
-	// The API uses Name field but the create body doesn't have it - it uses the network
-	// Looking at the API spec, CreateKubernetesClusterJSONBody only has Id and Network
-	// The Name comes from somewhere else or is auto-generated
-	// Let's use the name as the optional ID field
-	body.Id = pointer(data.Name.ValueString())
+	body.Name = data.Name.ValueString()
 
 	if !data.Network.IsNull() && !data.Network.IsUnknown() {
 		body.Network = data.Network.ValueStringPointer()
